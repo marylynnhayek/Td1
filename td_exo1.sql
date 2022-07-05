@@ -210,7 +210,57 @@ insert into Student values(14,'Jean',93);
 insert into Student values(15,'Tina',91);
 insert into Student values(16,'Alain',93);
 
+-- Exercice 5:
+--1. Trouver les noms des étudiants qui sont des amis avec ‘Gabriel’:
+select name
+from student s1, student s2, friend f1
+where s1.ID=F1.ID2 AND s2.ID=F1.ID1 and s2.name='Gabriel';
 
+-- 2. Pour chaque étudiant qui aime un autre qui possède une note inferieur de 2 ou plus, retourne le nom et la note de cet étudiant, ainsi que le nom et la note de l’étudiant qui aime:
+select S1.name, S1.mark, S2.name, S2.mark
+from student S1, likes L1, student S2
+where S1.ID=L1.ID1 and L1.ID2=S2.ID and (S1.mark>=S2.mark+2);
+
+-- 3. Pour chaque pair des étudiants dont l’un aime l’autre, afficher le nom et la note des deux étudiants. Afficher chaque pair une seule fois en ordre alphabétique:
+select H1.name, H1.mark, H2.name, H2.mark
+from Likes L1, Likes L2, Student S1, Student S2
+where S1.ID = L1.ID1 and S2.ID = L2.ID1 and L1.ID1 = L2.ID2 and L1.ID2 = L2.ID1
+and H1.name < H2.name;
+
+--Second solution
+select S1.name, S1.mark, S2.name, S2.mark
+from Student S1, Likes L1, Student S2
+where S1.ID = L1.ID1 and L1.ID2 = S2.ID and S1.name < S2.name and ID2 in (
+select ID1 from Likes where ID2 = L1.ID1)
+order by S1.name;
+
+-- 4. Trouver tous les étudiants qui n’apparaissent pas dans la table ‘Likes’ et retourne leurs noms et leurs notes. Trier les résultats par note, ensuite par nom:
+select name, mark
+from student
+where ID not in (select ID1 from Likes) AND ID not in(select ID2 from likes)
+order by mark,name;
+
+-- 5. Pour chaque situation dont un étudiant A aime un étudiant B, mais on ne possède aucune information sur les étudiants aimés par l’étudiant B (c’est-à-dire, B n’apparait pas comme ID1 dans la table ‘Likes’), retourne les nomes et les notes de A et B:
+select S1.mark, S1.name, S2.mark, S2.name
+from Student S1, Student S2, Likes L1
+where S1.ID=L1.ID1 and S2.ID=L.ID2 and ID2 not in (select ID1 from Likes)
+order by S1.name; 
+
+-- 6. Pour chaque étudiant A qui aime un étudiant B dont les deux ne sont pas des amis, trouver s’ils possèdent un ami C en commun. Pour ce trios, afficher le nom et la note de A, B et C:
+select S1.nom,S1.mark,S2.nom,S2.mark,S3.nom,S3.mark
+from Studen S1, Student S2, Student S3, Likes L, Friend F1, Friend F2
+where S1.ID=L.ID1 and S2.ID=L.ID2 and S1.ID not in (select ID1 from Friend where ID2=S2.ID) AND S3.ID=F1.ID1 and S3.ID=F2.ID1 and F1.ID2=S1.ID and F2.ID2=S2.ID;
+
+-- 7. Trouver la différence entre le nombre des étudiants à l’école et le nombre de diffèrent noms:
+select count(*)-count(distinct name)) as "La différence"
+from Student;
+
+-- 8. Trouver le nom et la note de tous les étudiants qui sont aimés par plus d’un autre étudiant:
+select name, mark
+from student S, Likes L
+where S.ID=L.ID2
+group by ID2
+having count(*)>1;
 
 
 
